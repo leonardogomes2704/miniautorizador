@@ -1,6 +1,7 @@
 package com.cadmus.miniautorizador.service;
 
 import com.cadmus.miniautorizador.dto.CartaoDTO;
+import com.cadmus.miniautorizador.dto.TransacaoDTO;
 import com.cadmus.miniautorizador.exception.CartaoExistenteException;
 import com.cadmus.miniautorizador.exception.CartaoNaoEncontradoException;
 import com.cadmus.miniautorizador.model.Cartao;
@@ -38,4 +39,11 @@ public class CartaoService {
                 .orElseThrow(() -> new CartaoNaoEncontradoException("Cartão não encontrado para o número: " + numeroCartao));
     }
 
+    public void debitarSaldoCartao(TransacaoDTO transacaoDTO) {
+        cartaoRepository.findById(transacaoDTO.getNumeroCartao())
+                .ifPresent(c -> {
+                    c.setSaldo(c.getSaldo().subtract(transacaoDTO.getValor()));
+                    cartaoRepository.save(c);
+        });
+    }
 }

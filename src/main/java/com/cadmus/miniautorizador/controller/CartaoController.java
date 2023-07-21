@@ -10,14 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/cartoes")
 public class CartaoController {
+    private final CartaoService cartaoService;
 
     @Autowired
-    private CartaoService cartaoService;
+    public CartaoController(CartaoService cartaoService){
+        this.cartaoService = cartaoService;
+    }
 
     @PostMapping
     public ResponseEntity<CartaoDTO> criar(@RequestBody CartaoDTO cartaoDTO){
