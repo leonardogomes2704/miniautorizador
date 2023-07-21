@@ -26,7 +26,7 @@ public class CartaoService {
         Cartao cartao = new Cartao(cartaoDTO.getNumeroCartao(), cartaoDTO.getSenha(), VALOR_INICIAL);
         cartao = cartaoRepository.save(cartao);
 
-        return new CartaoDTO(cartao.getNumeroCartao(), cartao.getSenha());
+        return new CartaoDTO(cartao.getSenha(), cartao.getNumeroCartao());
     }
 
     private boolean existeCartao(String numeroCartao) {
