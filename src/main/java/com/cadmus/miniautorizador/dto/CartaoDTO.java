@@ -10,8 +10,4 @@ public class CartaoDTO {
 
     private String senha;
     private String numeroCartao;
-
-
-
-
 }
