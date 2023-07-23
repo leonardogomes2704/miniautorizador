@@ -5,11 +5,15 @@ import com.cadmus.miniautorizador.enums.TransacaoEnum;
 import com.cadmus.miniautorizador.exception.CartaoInexistenteException;
 import com.cadmus.miniautorizador.exception.SaldoInsuficienteException;
 import com.cadmus.miniautorizador.exception.SenhaInvalidaException;
+import com.cadmus.miniautorizador.model.Cartao;
 import com.cadmus.miniautorizador.repository.CartaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 public class TransacaoService {
@@ -28,17 +32,25 @@ public class TransacaoService {
     }
 
     private void validacaoTransacao(TransacaoDTO transacaoDTO) {
-        cartaoRepository.findById(transacaoDTO.getNumeroCartao())
-                .ifPresent(c -> {
-                    if(c.getSaldo().compareTo(transacaoDTO.getValor()) < 0){
-                        throw new SaldoInsuficienteException(TransacaoEnum.SALDO_INSUFICIENTE.toString());
-                    }
-                    if(!c.getNumeroCartao().equals(transacaoDTO.getNumeroCartao())){
-                        throw new CartaoInexistenteException(TransacaoEnum.CARTAO_INEXISTENTE.toString());
-                    }
-                    if(!c.getSenha().equals(transacaoDTO.getSenhaCartao())){
-                        throw new SenhaInvalidaException(TransacaoEnum.SENHA_INVALIDA.toString());
-                    }
-                });
+        Optional<Cartao> cartaoOptional =  cartaoRepository.findById(transacaoDTO.getNumeroCartao());
+
+        cartaoOptional.orElseThrow(() -> new CartaoInexistenteException(TransacaoEnum.CARTAO_INEXISTENTE.toString()));
+
+        cartaoOptional.ifPresent(c -> {
+            validarSaldo(transacaoDTO.getValor(), c.getSaldo());
+            validarSenha(transacaoDTO.getSenhaCartao(), c.getSenha());
+        });
+    }
+
+    private static void validarSenha(String transacaoSenha, String cartaoSenha) {
+        if(!cartaoSenha.equals(transacaoSenha)){
+            throw new SenhaInvalidaException(TransacaoEnum.SENHA_INVALIDA.toString());
+        }
+    }
+
+    private static void validarSaldo(BigDecimal valorTransacao, BigDecimal saldoCartao) {
+        if(saldoCartao.compareTo(valorTransacao) < 0){
+            throw new SaldoInsuficienteException(TransacaoEnum.SALDO_INSUFICIENTE.toString());
+        }
     }
 }

@@ -1,15 +1,12 @@
 package com.cadmus.miniautorizador.controller;
 
-import com.cadmus.miniautorizador.dto.CartaoDTO;
 import com.cadmus.miniautorizador.dto.TransacaoDTO;
 import com.cadmus.miniautorizador.enums.TransacaoEnum;
-import com.cadmus.miniautorizador.exception.CartaoExistenteException;
 import com.cadmus.miniautorizador.exception.CartaoInexistenteException;
 import com.cadmus.miniautorizador.exception.SaldoInsuficienteException;
 import com.cadmus.miniautorizador.exception.SenhaInvalidaException;
 import com.cadmus.miniautorizador.service.TransacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

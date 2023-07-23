@@ -2,7 +2,9 @@ package com.cadmus.miniautorizador.service;
 
 import com.cadmus.miniautorizador.dto.CartaoDTO;
 import com.cadmus.miniautorizador.dto.TransacaoDTO;
+import com.cadmus.miniautorizador.enums.TransacaoEnum;
 import com.cadmus.miniautorizador.exception.CartaoExistenteException;
+import com.cadmus.miniautorizador.exception.CartaoInexistenteException;
 import com.cadmus.miniautorizador.exception.CartaoNaoEncontradoException;
 import com.cadmus.miniautorizador.model.Cartao;
 import com.cadmus.miniautorizador.repository.CartaoRepository;
@@ -10,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Optional;
 
 @Service
@@ -40,8 +41,11 @@ public class CartaoService {
     }
 
     public void debitarSaldoCartao(TransacaoDTO transacaoDTO) {
-        cartaoRepository.findById(transacaoDTO.getNumeroCartao())
-                .ifPresent(c -> {
+        Optional<Cartao> cartaoOptional = cartaoRepository.findById(transacaoDTO.getNumeroCartao());
+
+        cartaoOptional.orElseThrow(() -> new CartaoInexistenteException(TransacaoEnum.CARTAO_INEXISTENTE.toString()));
+
+        cartaoOptional.ifPresent(c -> {
                     c.setSaldo(c.getSaldo().subtract(transacaoDTO.getValor()));
                     cartaoRepository.save(c);
         });
